@@ -61,6 +61,7 @@ function App() {
   return (
     <MapContext.Provider value={{ map, scene }}>
       {/* <button id="fly">飞到武汉</button> */}
+      <Header />
       <HomeView />
       <div id="map"></div>
     </MapContext.Provider>

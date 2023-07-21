@@ -1,0 +1,18 @@
+.g2-left,
+.g2-right {
+  position: absolute;
+  z-index: 3;
+  width: 27vw;
+  top: 120px;
+  height: 75vh;
+  /* overflow: hidden; */
+  /* border: 1px solid #ccc; */
+}
+
+.g2-left {
+  left: 20px;
+}
+
+.g2-right {
+  right: 100px;
+}
