@@ -79,9 +79,9 @@ export default function G2Chart() {
           header={"武汉三甲医院"}
           content={
             <div className="hospital">
-              {hospital.map((h) => {
+              {hospital.map((h, index) => {
                 return (
-                  <div className={"item"}>
+                  <div className={"item"} key={index}>
                     <p>
                       {h.title}
                       <span>
@@ -89,7 +89,15 @@ export default function G2Chart() {
                         {h.unit}
                       </span>
                     </p>
-                    <img src={h.url} alt="pic" />
+                    <img
+                      src={h.url}
+                      alt="pic"
+                      style={{
+                        marginTop: "10px",
+                        width: "50px",
+                        height: "50px",
+                      }}
+                    />
                   </div>
                 );
               })}
@@ -100,9 +108,9 @@ export default function G2Chart() {
           header={"武汉市高校学生统计"}
           content={
             <div className="school">
-              {school.map((s) => {
+              {school.map((s, index) => {
                 return (
-                  <div className={"item"}>
+                  <div className={"item"} key={index}>
                     <p>
                       {s.title}
                       <span>
@@ -110,7 +118,15 @@ export default function G2Chart() {
                         {s.unit}
                       </span>
                     </p>
-                    <img src={s.url} alt="pic" />
+                    <img
+                      src={s.url}
+                      alt="pic"
+                      style={{
+                        marginTop: "10px",
+                        width: "50px",
+                        height: "50px",
+                      }}
+                    />
                   </div>
                 );
               })}

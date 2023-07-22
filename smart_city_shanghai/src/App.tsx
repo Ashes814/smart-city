@@ -18,9 +18,9 @@ function App() {
       container: "map",
       style: "mapbox://styles/mapbox/dark-v11",
       center: [114.3, 30.5],
-      zoom: 13,
+      zoom: 1,
+      // pitch: 90,
       projection: "globe",
-      pitch: 70,
     });
 
     const scene = new Scene({
