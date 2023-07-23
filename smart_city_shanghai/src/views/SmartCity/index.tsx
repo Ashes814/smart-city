@@ -14,9 +14,14 @@ export default function SmartCity() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const buildRes = await axios("http://localhost:8080/wuhan_building");
+        // const buildRes = await axios("http://localhost:8080/wuhan_building");
+        const buildRes = await axios(
+          "http://localhost:8080/geoserver/sh/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=sh%3AWuhan_Buildings&outputFormat=application%2Fjson"
+        );
         setBuildData(buildRes.data);
-        const roadRes = await axios("http://localhost:8080/wuhan_roads");
+        const roadRes = await axios(
+          "http://localhost:8080/geoserver/sh/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=sh%3AWuhan_roads&outputFormat=application%2Fjson"
+        );
         setRoadData(roadRes.data);
         console.log("建筑数据加载成功");
         console.log("道路数据加载成功");
@@ -57,7 +62,7 @@ export default function SmartCity() {
             sweepCenter: [114.3, 30.5],
           },
         })
-        .filter("Elevation", (h) => h > 40);
+        .filter("Elevation", (h) => h > 10);
       if (!cityLayerAdded && buildData) {
         console.log("cityLayer added");
 
@@ -97,7 +102,7 @@ export default function SmartCity() {
           color: "#0ff",
           mix: 0.5,
         })
-        .filter("coordinates", (evt) => evt.length > 20);
+        .filter("coordinates", (evt) => evt.length > 5);
 
       if (!roadLayerAdded && roadData) {
         console.log("roadLayer added");
