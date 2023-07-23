@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import MapContext from "../../store/map-context";
 import "./index.css";
 import Footer from "../../components/Footer";
+import { DrawTool } from "../../components/DrawTool";
 import { fa } from "element-plus/es/locale/index.js";
 
 const BottomControl = ({ showControlHandler }) => {
@@ -87,6 +88,11 @@ const BottomControl = ({ showControlHandler }) => {
                 <i className="iconfont icon-icon-test"></i>
               </button>
               <p>{isInWuhan ? "飞入武汉" : "地图复位"}</p>
+            </div>
+            <div className="item">
+              <DrawTool />
+
+              <p>范围查询</p>
             </div>
           </div>
         }

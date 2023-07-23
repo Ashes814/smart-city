@@ -1,0 +1,23 @@
+.el-button + .el-button {
+  margin-left: 8px;
+}
+
+.popover-w {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.query-item {
+  color: #fff;
+}
+
+.query-item:hover {
+  cursor: pointer;
+  color: red;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 128, 255, 0.6),
+    rgba(0, 128, 255, 0.281)
+  );
+}

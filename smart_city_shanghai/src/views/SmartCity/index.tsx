@@ -1,15 +1,22 @@
 import React, { useContext, useEffect, useState } from "react";
 import MapContext from "../../store/map-context";
 import axios from "axios";
-import { CityBuildingLayer, LayerSwitch, LineLayer } from "@antv/l7";
+import {
+  CityBuildingLayer,
+  LayerSwitch,
+  LineLayer,
+  PolygonLayer,
+} from "@antv/l7";
 export default function SmartCity() {
   const ctx = useContext(MapContext);
   const { map, scene } = ctx;
   const [buildData, setBuildData] = useState(null);
   const [roadData, setRoadData] = useState(null);
+  const [shAreaData, setShAreaData] = useState(null);
   const [layerSwitchAdded, setLayerSwitchAdded] = useState(false);
   const [roadLayerAdded, setRoadLayerAdded] = useState(false);
   const [cityLayerAdded, setCityLayerAdded] = useState(false);
+  const [shAreaLayerAdded, setShAreaLayerAdded] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,6 +30,11 @@ export default function SmartCity() {
           "http://localhost:8080/geoserver/sh/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=sh%3AWuhan_roads&outputFormat=application%2Fjson"
         );
         setRoadData(roadRes.data);
+        const shAreaRes = await axios(
+          "http://localhost:8080/geoserver/sh/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=sh%3Ash_area&outputFormat=application%2Fjson"
+        );
+        setShAreaData(shAreaRes.data);
+
         console.log("建筑数据加载成功");
         console.log("道路数据加载成功");
       } catch (error) {
@@ -35,6 +47,7 @@ export default function SmartCity() {
 
   useEffect(() => {
     if (map && scene) {
+      // add wuhan citylayer
       const cityLayer = new CityBuildingLayer({
         name: "武汉市建筑",
       });
@@ -71,6 +84,7 @@ export default function SmartCity() {
         setCityLayerAdded(true);
       }
 
+      // add wuhan road layer
       const colors = [
         "#87CEFA",
         "#00BFFF",
@@ -110,6 +124,22 @@ export default function SmartCity() {
         setRoadLayerAdded(true);
       }
 
+      // add shanghai layer control
+      const shAreaLayer = new PolygonLayer({
+        name: "上海市行政边界",
+      });
+      shAreaLayer
+        .source(shAreaData)
+        .shape("fill")
+        .color("#f00")
+        .style({ opacity: 0.6 });
+      if (!shAreaLayerAdded && shAreaData) {
+        console.log("shAreaLayer added");
+        scene.addLayer(shAreaLayer);
+        setShAreaLayerAdded(true);
+      }
+      // add layer control
+
       if (!layerSwitchAdded && roadLayerAdded && cityLayerAdded) {
         const layerSwitch = new LayerSwitch({
           layers: [],
@@ -119,7 +149,7 @@ export default function SmartCity() {
         setLayerSwitchAdded(true);
       }
     }
-  }, [buildData, roadData]);
+  }, [buildData, roadData, shAreaData]);
 
   return <div></div>;
 }
