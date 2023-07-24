@@ -7,11 +7,7 @@ export default function Header() {
   return (
     <>
       <header className="header">
-        <div className="timer">
-          <p>2023-09-10</p>
-          <p>09:20</p>
-        </div>
-        <span>智慧城市-武汉</span>
+        <h1>智慧城市管理系统 - 武汉-上海 </h1>
       </header>
     </>
   );

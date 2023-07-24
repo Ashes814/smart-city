@@ -4,6 +4,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import MapContext from "./store/map-context";
 import { Scene, Mapbox } from "@antv/l7";
 import Header from "./components/Header";
+import Focus from "./components/Focus";
 
 import "./App.css";
 import HomeView from "./views/HomeView";
@@ -63,8 +64,11 @@ function App() {
     <MapContext.Provider value={{ map, scene }}>
       {/* <button id="fly">飞到武汉</button> */}
       <Header />
+      <Focus />
       <HomeView />
+
       <div id="map"></div>
+      <img src="src/assets/images/bg01warp.png" className="bg"></img>
     </MapContext.Provider>
   );
 }

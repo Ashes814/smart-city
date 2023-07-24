@@ -45,10 +45,15 @@ const BottomControl = ({ showControlHandler }) => {
       map.flyTo({
         center: [114.3, 30.5],
         zoom: 13,
-        pitch: 80,
       });
     }
     setIsInWuhan(!isInWuhan);
+  };
+  const fylToSh = () => {
+    map.flyTo({
+      center: [121.3, 31.0],
+      zoom: 13,
+    });
   };
 
   useEffect(() => {
@@ -68,35 +73,34 @@ const BottomControl = ({ showControlHandler }) => {
   }, [map, isRotate]);
   return (
     <div>
-      <Footer
-        btn={
-          <div className="btn-groups">
-            <div className="item">
-              <button className="btn-toggle" onClick={rotateHandler}>
-                <i className="iconfont icon-fuwudiqiu"></i>
-              </button>
-              <p>{isRotate ? "停止自转" : "开始自转"}</p>
-            </div>
-            <div className="item">
-              <button className="btn-toggle" onClick={controlCenterHandler}>
-                <i className="iconfont icon-supervision-full"></i>
-              </button>
-              <p>{"控制中心"}</p>
-            </div>
-            <div className="item">
-              <button className="btn-toggle" onClick={fylTo}>
-                <i className="iconfont icon-icon-test"></i>
-              </button>
-              <p>{isInWuhan ? "飞入武汉" : "地图复位"}</p>
-            </div>
-            <div className="item">
-              <DrawTool />
+      <div className="btn-groups">
+        <div className="item" onClick={rotateHandler}>
+          <button className="btn-toggle">
+            <i className="iconfont icon-fuwudiqiu"></i>
+          </button>
+          <p>{isRotate ? "停止自转" : "开始自转"}</p>
+        </div>
+        <div className="item" onClick={controlCenterHandler}>
+          <button className="btn-toggle">
+            <i className="iconfont icon-supervision-full"></i>
+          </button>
+          <p>{"控制中心"}</p>
+        </div>
+        <div className="item" onClick={fylTo}>
+          <button className="btn-toggle">
+            <i className="iconfont icon-icon-test"></i>
+          </button>
+          <p>{isInWuhan ? "飞入武汉" : "地图复位"}</p>
+        </div>
+        <div className="item" onClick={fylToSh}>
+          <button className="btn-toggle">
+            <i className="iconfont icon-icon-test"></i>
+          </button>
+          <p>{"飞入上海"}</p>
+        </div>
 
-              <p>范围查询</p>
-            </div>
-          </div>
-        }
-      />
+        <DrawTool />
+      </div>
     </div>
   );
 };

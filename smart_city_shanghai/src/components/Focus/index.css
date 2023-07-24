@@ -1,0 +1,58 @@
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+    animation-timing-function: ease-in; /* 动画开始时快速 */
+  }
+  100% {
+    transform: rotate(360deg);
+    animation-timing-function: ease-out; /* 动画结束时慢速 */
+  }
+}
+.focus {
+  position: fixed;
+  top: 100px;
+  left: 150px;
+  color: aliceblue;
+}
+
+.logoline {
+  position: absolute;
+  top: 35px;
+  left: 0;
+}
+.logoline1 {
+  position: absolute;
+  top: -32px;
+  left: -29px;
+}
+.logoline2 {
+  position: absolute;
+  top: 54px;
+  left: 50px;
+}
+.logoline3 {
+  position: absolute;
+  top: -45px;
+  left: -16px;
+  animation: rotate 5s infinite;
+}
+
+.date-timer {
+  width: 120px;
+  position: absolute;
+  top: 0;
+  left: 90px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.date-timer > p {
+  font-size: 28px;
+}
+
+.date-timer > ul {
+  display: flex;
+  flex-direction: row;
+}

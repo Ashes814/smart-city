@@ -29,13 +29,13 @@ export default function MapControl() {
         exitBtnText: "退出全屏",
       });
       scene.addControl(fullscreen);
-      const mouseLocation = new MouseLocation({
-        transform: (position) => {
-          return position;
-        },
-        position: "rightbottom",
-      });
-      scene.addControl(mouseLocation);
+      // const mouseLocation = new MouseLocation({
+      //   transform: (position) => {
+      //     return position;
+      //   },
+      //   position: "rightbottom",
+      // });
+      // scene.addControl(mouseLocation);
       const mapTheme = new MapTheme({});
       scene.addControl(mapTheme);
       setControlAdded(true);

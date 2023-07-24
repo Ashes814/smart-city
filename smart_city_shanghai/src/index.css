@@ -1,3 +1,4 @@
+@import url("http://fonts.googleapis.com/css?family=Bitter:400,700,400italic");
 * {
   margin: 0;
   padding: 0;
@@ -11,4 +12,12 @@ li {
 
 table {
   border-collapse: collapse;
+}
+
+body {
+  font-family: "bitter";
+  padding: 20px 50px;
+  text-align: center;
+  background-color: #000;
+  background-size: cover;
 }
