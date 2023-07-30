@@ -10,14 +10,16 @@
 
 .query-item {
   color: #fff;
+  transition: all 0.3s;
 }
 
 .query-item:hover {
   cursor: pointer;
-  color: red;
-  background: linear-gradient(
+  /* color: red; */
+  transform: translateY(-3px);
+  /* background: linear-gradient(
     to bottom,
     rgba(0, 128, 255, 0.6),
     rgba(0, 128, 255, 0.281)
-  );
+  ); */
 }

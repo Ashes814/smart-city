@@ -1,3 +1,4 @@
+import "./route.css";
 export default function Root() {
-  return <></>;
+  return <div className="school"></div>;
 }

@@ -1,6 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
 import MapContext from "../../store/map-context";
-import { Logo, Zoom, Fullscreen, MouseLocation, MapTheme } from "@antv/l7";
+import {
+  Logo,
+  Zoom,
+  Fullscreen,
+  MouseLocation,
+  MapTheme,
+  LayerSwitch,
+} from "@antv/l7";
 
 export default function MapControl() {
   const ctx = useContext(MapContext);
@@ -29,13 +36,13 @@ export default function MapControl() {
         exitBtnText: "退出全屏",
       });
       scene.addControl(fullscreen);
-      // const mouseLocation = new MouseLocation({
-      //   transform: (position) => {
-      //     return position;
-      //   },
-      //   position: "rightbottom",
-      // });
-      // scene.addControl(mouseLocation);
+      const mouseLocation = new MouseLocation({
+        transform: (position) => {
+          return position;
+        },
+        position: "leftbottom",
+      });
+      scene.addControl(mouseLocation);
       const mapTheme = new MapTheme({});
       scene.addControl(mapTheme);
       setControlAdded(true);

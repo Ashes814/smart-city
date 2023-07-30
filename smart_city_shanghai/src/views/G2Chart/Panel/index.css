@@ -13,18 +13,17 @@
 }
 
 .g2-chart {
-  padding: 0 10px;
+  padding: 0 0px;
 }
 
 .g2-content {
   position: relative;
   width: 100%;
-  min-height: 100px;
-  max-height: 300px;
+  height: 280px;
   background: #53697670;
   border-radius: 10px;
   color: #fff;
-  padding: 15px;
+  padding: 10px;
 }
 
 .g2-content::after {
@@ -46,14 +45,6 @@
   width: 111px;
   height: 35px;
   background-image: url("../../../assets/images/border.png");
-}
-
-.hospital,
-.school {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  align-items: center;
 }
 
 .item {

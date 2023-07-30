@@ -1,0 +1,11 @@
+Model Information:
+* title:	PolyU Main campus mesh model from UAV image
+* source:	https://sketchfab.com/3d-models/polyu-main-campus-mesh-model-from-uav-image-daa690af7e264b2aba4c7dcf88a8f16f
+* author:	Yu Kai Him Otto (https://sketchfab.com/ottoyu)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "PolyU Main campus mesh model from UAV image" (https://sketchfab.com/3d-models/polyu-main-campus-mesh-model-from-uav-image-daa690af7e264b2aba4c7dcf88a8f16f) by Yu Kai Him Otto (https://sketchfab.com/ottoyu) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

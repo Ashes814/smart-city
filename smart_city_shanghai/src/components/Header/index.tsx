@@ -7,7 +7,7 @@ export default function Header() {
   return (
     <>
       <header className="header">
-        <h1>智慧城市管理系统 - 武汉-上海 </h1>
+        <h1>双城智慧管理系统 - 武汉-上海 </h1>
       </header>
     </>
   );

@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import MapContext from "../../store/map-context";
 import axios from "axios";
+import { message } from "antd";
 import {
   CityBuildingLayer,
   LayerSwitch,
@@ -8,10 +9,28 @@ import {
   PolygonLayer,
   PointLayer,
   HeatmapLayer,
+  LayerPopup,
 } from "@antv/l7";
+import { Modal } from "antd";
+
+// LAYERS
+let cityLayer = null;
+let roadLayer = null;
 export default function SmartCity() {
   const ctx = useContext(MapContext);
   const { map, scene } = ctx;
+
+  // DATA OK MESSAGE
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
+  const success = () => {
+    messageApi.open({
+      type: "success",
+      content: "数据全部加载成功",
+    });
+  };
+
+  // DATA STATE
   const [buildData, setBuildData] = useState(null);
   const [roadData, setRoadData] = useState(null);
   const [shAreaData, setShAreaData] = useState(null);
@@ -19,11 +38,11 @@ export default function SmartCity() {
   const [shDistrictData, setShDistrictData] = useState(null);
   const [shBuildingData, setShBuildingData] = useState(null);
   const [shRoadData, setShRoadData] = useState(null);
-  const [shRailwayData, setShRailwayData] = useState(null);
   const [dotPointData, setDotPointData] = useState(null);
   const [flyData, setFlytData] = useState(null);
   const [shSubwayData, setShSubwayData] = useState(null);
-  const [layerSwitchAdded, setLayerSwitchAdded] = useState(false);
+
+  // LAYER ADD CONTROL
   const [roadLayerAdded, setRoadLayerAdded] = useState(false);
   const [cityLayerAdded, setCityLayerAdded] = useState(false);
   const [shAreaLayerAdded, setShAreaLayerAdded] = useState(false);
@@ -31,15 +50,28 @@ export default function SmartCity() {
   const [shDistrictAdded, setShDistrictAdded] = useState(false);
   const [shBuildingAdded, setShBuildingAdded] = useState(false);
   const [shRoadAdded, setShRoadAdded] = useState(false);
-  const [shRailwayAdded, setShRailwayAdded] = useState(false);
   const [dotPointAdded, setDotPointAdded] = useState(false);
   const [flyLineAdded, setFlyLineAdded] = useState(false);
   const [shSubwayAdded, setShSubwayAdded] = useState(false);
 
+  // MODAL SETTING
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [buildInfo, setBuildInfo] = useState(false);
+
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // const buildRes = await axios("http://localhost:8080/wuhan_building");
         const buildRes = await axios(
           "http://localhost:8080/geoserver/sh/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=sh%3AWuhan_Buildings&outputFormat=application%2Fjson"
         );
@@ -48,7 +80,6 @@ export default function SmartCity() {
           "http://localhost:8080/geoserver/sh/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=sh%3AWuhan_roads&outputFormat=application%2Fjson"
         );
         setRoadData(roadRes.data);
-
         const shAreaRes = await axios(
           "http://localhost:8080/geoserver/sh/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=sh%3Ash_area&outputFormat=application%2Fjson"
         );
@@ -69,16 +100,10 @@ export default function SmartCity() {
           "http://localhost:8080/geoserver/sh/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=sh%3Ash_roads&outputFormat=application%2Fjson"
         );
         setShRoadData(shRoadRes.data);
-        const shRailwayRes = await axios(
-          "http://localhost:8080/geoserver/sh/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=sh%3Ash_railways&outputFormat=application%2Fjson"
-        );
-        setShRailwayData(shRailwayRes.data);
         const shSubwayRes = await axios(
           "http://localhost:8080/geoserver/sh/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=sh%3AshSubway&outputFormat=application%2Fjson"
         );
         setShSubwayData(shSubwayRes.data);
-
-        console.log("数据加载成功");
       } catch (error) {
         console.log(error);
       }
@@ -89,44 +114,7 @@ export default function SmartCity() {
 
   useEffect(() => {
     if (map && scene) {
-      // add wuhan citylayer
-      const cityLayer = new CityBuildingLayer({
-        name: "武汉市建筑",
-      });
-      cityLayer
-        .source(buildData)
-        .size("Elevation", (h) => h)
-        .color("rgb(242, 246, 250)")
-        .animate({
-          enable: true,
-        })
-        .active({
-          color: "#0ff",
-          mix: 0.5,
-        })
-        .style({
-          opacity: 0.7,
-          baseColor: "rgb(16,16,16)",
-          windowColor: "rgb(30,30,30)",
-          brightColor: "rgb(255, 176, 38)",
-          sweep: {
-            enable: true,
-            sweepRadius: 2,
-            sweepColor: "#1990fF",
-            sweepSpeed: 0.3,
-            sweepCenter: [114.3, 30.5],
-          },
-        })
-        .filter("Elevation", (h) => h > 10);
-      if (!cityLayerAdded && buildData) {
-        console.log("cityLayer added");
-
-        scene.addLayer(cityLayer);
-
-        setCityLayerAdded(true);
-      }
-
-      // add wuhan road layer
+      // DEFINE CONSTANTS
       const colors = [
         "#87CEFA",
         "#00BFFF",
@@ -141,180 +129,6 @@ export default function SmartCity() {
         "#FF2D51",
         "#333",
       ];
-      const roadLayer = new LineLayer({
-        name: "武汉市道路",
-      });
-      roadLayer
-        .source(roadData)
-        .size(1)
-        .shape("line")
-        .color("name", colors)
-        .animate({
-          interval: 1,
-          duration: 2,
-          trailLength: 2,
-        })
-        .active({
-          color: "#0ff",
-          mix: 0.5,
-        })
-        .filter("coordinates", (evt) => evt.length > 5);
-
-      if (!roadLayerAdded && roadData) {
-        console.log("roadLayer added");
-        scene.addLayer(roadLayer);
-        setRoadLayerAdded(true);
-      }
-
-      // add shanghai area layer control
-      const shAreaLayer = new PolygonLayer({
-        name: "上海市行政边界",
-      });
-      shAreaLayer
-        .source(shAreaData)
-        .shape("fill")
-        .color("#888")
-        .active({
-          color: "#0ff",
-          mix: 0.5,
-        })
-        .style({ opacity: 0.6 });
-      if (!shAreaLayerAdded && shAreaData) {
-        console.log("shAreaLayer added");
-        // scene.addLayer(shAreaLayer);
-        setShAreaLayerAdded(true);
-      }
-      // add shanghai district control
-      const shDistrictLayer = new PolygonLayer({
-        name: "上海市区县行政边界",
-        zIndex: 3,
-      });
-      shDistrictLayer
-        .source(shDistrictData)
-        .shape("fill")
-        .color("name", colors)
-        .active({
-          color: "#0ff",
-          mix: 0.5,
-        })
-        .style({ opacity: 0.6 });
-      if (!shDistrictAdded && shDistrictData) {
-        console.log("SH DISTRICT ADDED");
-        // scene.addLayer(shDistrictLayer);
-        setShDistrictAdded(true);
-      }
-      // add shanghai landuse control
-      const shLanduseLayer = new PolygonLayer({
-        name: "上海市土地利用",
-        zIndex: 4,
-      });
-      shLanduseLayer
-        .source(shLanduseData)
-        .shape("fill")
-        .color("fclass", colors)
-        .active({
-          color: "#0ff",
-          mix: 0.5,
-        })
-        .style({ opacity: 0.6 });
-      if (!shLanduseAdded && shLanduseData) {
-        console.log("SH LANDUSE ADDED");
-        // scene.addLayer(shLanduseLayer);
-        setShLanduseAdded(true);
-      }
-
-      // add sh building layer
-      const shBuildingLayer = new CityBuildingLayer({
-        name: "上海市建筑",
-      });
-      shBuildingLayer
-        .source(shBuildingData)
-        .size(100)
-        .color("rgb(242, 246, 250)")
-        .animate({
-          enable: true,
-        })
-        .active({
-          color: "#0ff",
-          mix: 0.5,
-        })
-        .style({
-          opacity: 0.7,
-          baseColor: "rgb(16,16,16)",
-          windowColor: "rgb(30,30,30)",
-          brightColor: "rgb(255, 176, 38)",
-          sweep: {
-            enable: true,
-            sweepRadius: 2,
-            sweepColor: "#1990fF",
-            sweepSpeed: 0.3,
-            sweepCenter: [121.3, 31.0],
-          },
-        });
-      if (!shBuildingAdded && shBuildingData) {
-        console.log("SH BUILDING added");
-
-        // scene.addLayer(shBuildingLayer);
-
-        setShBuildingAdded(true);
-      }
-
-      // add sh road layer
-
-      const shRoadLayer = new LineLayer({
-        name: "上海市道路",
-      });
-      shRoadLayer
-        .source(shRoadData)
-        .size(1)
-        .shape("line")
-        // .color("name", colors)
-        .animate({
-          interval: 1,
-          duration: 2,
-          trailLength: 2,
-        })
-        .active({
-          color: "#0ff",
-          mix: 0.5,
-        })
-        .filter("coordinates", (evt) => evt.length > 5);
-
-      if (!shRoadAdded && shRoadData) {
-        console.log("SH ROAD ADDED");
-        // scene.addLayer(shRoadLayer);
-        setShRoadAdded(true);
-      }
-      // add sh road layer
-
-      const shRailwayLayer = new LineLayer({
-        name: "上海市轨道交通",
-      });
-      shRailwayLayer
-        .source(shRailwayData)
-        .size(1)
-        .shape("line")
-        .color("fclass", colors)
-        .animate({
-          interval: 1,
-          duration: 2,
-          trailLength: 2,
-        })
-        .active({
-          color: "#0ff",
-          mix: 0.5,
-        })
-        .style({
-          lineType: "dash",
-          dashArray: [5, 5],
-        });
-
-      if (!shRailwayAdded && shRailwayData) {
-        console.log("SH RAILWAY ADDED");
-        // scene.addLayer(shRailwayLayer);
-        setShRailwayAdded(true);
-      }
-      // add flyLine
       const flyline = [
         {
           from: "121.808318, 31.140456",
@@ -509,7 +323,6 @@ export default function SmartCity() {
           to: "121.774017, 12.879721",
         },
       ];
-
       const dot = [
         {
           area: "泰国",
@@ -1088,7 +901,6 @@ export default function SmartCity() {
           type: "ok",
         },
       ];
-
       setDotPointData(dot);
       const flydata = flyline.map((item) => {
         // @ts-ignore
@@ -1103,8 +915,171 @@ export default function SmartCity() {
       });
       setFlytData(flydata);
 
+      // ADD WUHAN CITY LAYER
+      cityLayer = new CityBuildingLayer({
+        name: "武汉市建筑",
+        visible: false,
+      });
+      cityLayer
+        .source(buildData)
+        .size("Elevation", (h) => h)
+        .color("rgb(242, 246, 250)")
+        .animate({
+          enable: true,
+        })
+        .active({
+          color: "#0ff",
+          mix: 0.5,
+        })
+        .style({
+          opacity: 0.7,
+          baseColor: "rgb(16,16,16)",
+          windowColor: "rgb(30,30,30)",
+          brightColor: "rgb(255, 176, 38)",
+          sweep: {
+            enable: true,
+            sweepRadius: 2,
+            sweepColor: "#1990fF",
+            sweepSpeed: 0.3,
+            sweepCenter: [114.3, 30.5],
+          },
+        })
+        .filter("Elevation", (h) => h > 10);
+
+      // ADD WUHAN ROAD LAYER
+      roadLayer = new LineLayer({
+        name: "武汉市道路",
+        visible: false,
+      });
+      roadLayer
+        .source(roadData)
+        .size(1)
+        .shape("line")
+        .color("name", colors)
+        .animate({
+          interval: 1,
+          duration: 2,
+          trailLength: 2,
+        })
+        .active({
+          color: "#0ff",
+          mix: 0.5,
+        })
+        .filter("coordinates", (evt) => evt.length > 20);
+
+      // ADD SHANGHAI AREA LAYER
+      const shAreaLayer = new PolygonLayer({
+        name: "上海市行政边界",
+        visible: false,
+      });
+      shAreaLayer
+        .source(shAreaData)
+        .shape("fill")
+        .color("#888")
+        .active({
+          color: "#0ff",
+          mix: 0.5,
+        })
+        .style({ opacity: 0.9 });
+      console.log(shAreaLayer);
+      // ADD SH DISTRICT LAYER
+      const shDistrictLayer = new PolygonLayer({
+        name: "上海市区县行政边界",
+        zIndex: 3,
+        visible: false,
+      });
+      shDistrictLayer
+        .source(shDistrictData)
+        .shape("line")
+        .color("#fff")
+        .active({
+          color: "#0ff",
+          mix: 0.5,
+        })
+        .style({ opacity: 0.6, stroke: "red", strokeWidth: 2 });
+
+      // ADD SH LANDUSE LAYER
+      const shLanduseLayer = new PolygonLayer({
+        name: "上海市土地利用",
+        zIndex: 4,
+        visible: false,
+      });
+      shLanduseLayer
+        .source(shLanduseData)
+        .shape("fill")
+        .color("fclass", colors)
+        .active({
+          color: "#0ff",
+          mix: 0.5,
+        })
+        .style({ opacity: 0.6 });
+
+      // ADD SH BUILDING LAYER
+      const shBuildingLayer = new CityBuildingLayer({
+        name: "上海市建筑",
+        visible: false,
+      });
+      shBuildingLayer
+        .source(shBuildingData)
+        .size(100)
+        .color("rgb(242, 246, 250)")
+        .animate({
+          enable: true,
+        })
+        .active({
+          color: "#0ff",
+          mix: 0.5,
+        })
+        .style({
+          opacity: 0.7,
+          baseColor: "rgb(16,16,16)",
+          windowColor: "rgb(30,30,30)",
+          brightColor: "rgb(255, 176, 38)",
+          sweep: {
+            enable: true,
+            sweepRadius: 2,
+            sweepColor: "#1990fF",
+            sweepSpeed: 0.3,
+            sweepCenter: [121.42, 31.3],
+          },
+        });
+
+      // ADD SH ROAD LAYER
+
+      const shRoadLayer = new LineLayer({
+        name: "上海市道路",
+        visible: false,
+      });
+      shRoadLayer
+        .source(shRoadData)
+        .size(0.5)
+        .shape("line")
+        .animate({
+          interval: 1,
+          duration: 2,
+          trailLength: 2,
+        })
+        .active({
+          color: "#0ff",
+          mix: 0.5,
+        })
+        .color("name", [
+          "#0A3663",
+          "#1558AC",
+          "#3771D9",
+          "#4D89E5",
+          "#64A5D3",
+          "#72BED6",
+          "#83CED6",
+          "#A6E1E0",
+          "#B8EFE2",
+          "#D7F9F0",
+        ])
+        .filter("coordinates", (evt) => evt.length > 10);
+      // ADD DOT POINT LAYER
       const dotPointLayer = new PointLayer({
-        name: "dot",
+        name: "友好城市",
+        visible: false,
       })
         .source(dotPointData, {
           parser: {
@@ -1114,30 +1089,18 @@ export default function SmartCity() {
           },
         })
         .shape("circle")
-        .color("#ffed11")
+        .color("#8C1EB2")
         .animate(true)
         .active({
           color: "#0ff",
         })
         .size(40);
-      if (!dotPointAdded && dotPointData) {
-        console.log("DOT POINT ADDED");
-        // ADD Flyline
-        scene.addImage(
-          "plane",
-          "https://gw.alipayobjects.com/zos/bmw-prod/0ca1668e-38c2-4010-8568-b57cb33839b9.svg"
-        );
-        // scene.addLayer(dotPointLayer);
-        dotPointLayer.on("click", (e) => {
-          console.log("hoverdot");
-          console.log(e);
-        });
-        setDotPointAdded(true);
-      }
 
+      // ADD FLYLINE LAYER
       const flyLine = new LineLayer({
         name: "航线",
-        blend: "normal",
+        blend: "additive",
+        visible: false,
       })
         .source(flyData, {
           parser: {
@@ -1145,35 +1108,19 @@ export default function SmartCity() {
             coordinates: "coord",
           },
         })
-        .color("#ff6b34")
-        .texture("plane")
-        .shape("arc")
-        .size(10)
-        .animate({
-          duration: 1,
-          interval: 0.5,
-          trailLength: 0.05,
-        })
-        .active({
-          color: "#0ff",
-        })
-        .style({
-          // lineType: "dash",
-          // dashArray: [5, 5],
-          // opacity: 0.5,
-          textureBlend: "replace",
-          lineTexture: true, // 开启线的贴图功能
-          iconStep: 10, // 设置贴图纹理的间距
-        });
-      if (!flyLineAdded && flyData) {
-        console.log("FLY LINE1 ADDED");
-        // scene.addLayer(flyLine);
-        setFlyLineAdded(true);
-      }
 
-      // ADD SHANGHAI SUBWAY DATA
+        .size(1)
+        .shape("arc")
+        .color("#8C1EB2")
+        .style({
+          opacity: 0.8,
+          blur: 0.99,
+        });
+
+      // ADD SH SUBWAY LAYER
       const shSubwayLayer = new HeatmapLayer({
         name: "上海地铁站客流量",
+        visible: false,
       })
         .source(shSubwayData)
         .size("capacity", [0, 1])
@@ -1194,32 +1141,138 @@ export default function SmartCity() {
             positions: [0, 0.2, 0.4, 0.6, 0.8, 1.0],
           },
         });
-      if (!shSubwayAdded && shSubwayData) {
-        console.log("SH SUBWAY ADDED");
-        // scene.addLayer(shSubwayLayer);
-        setShSubwayAdded(true);
-      }
-
-      // add layer control
 
       if (
-        !layerSwitchAdded &&
-        roadLayerAdded &&
-        cityLayerAdded &&
-        shAreaLayerAdded &&
-        shDistrictAdded &&
-        shLanduseAdded &&
-        shBuildingAdded &&
-        shRoadAdded &&
-        shRailwayAdded &&
-        shSubwayAdded
+        !cityLayerAdded &&
+        buildData &&
+        !roadLayerAdded &&
+        roadData &&
+        !shAreaLayerAdded &&
+        shAreaData &&
+        !shDistrictAdded &&
+        shDistrictData &&
+        !shLanduseAdded &&
+        shLanduseData &&
+        !shBuildingAdded &&
+        shBuildingData &&
+        !shRoadAdded &&
+        shRoadData &&
+        !dotPointAdded &&
+        dotPointData &&
+        !flyLineAdded &&
+        flyData &&
+        !shSubwayAdded &&
+        shSubwayData
       ) {
-        const layerSwitch = new LayerSwitch({
-          layers: [],
+        scene.addImage(
+          "plane",
+          "https://gw.alipayobjects.com/zos/bmw-prod/0ca1668e-38c2-4010-8568-b57cb33839b9.svg"
+        );
+
+        scene.addLayer(cityLayer);
+        scene.addLayer(roadLayer);
+        scene.addLayer(shAreaLayer);
+        scene.addLayer(shDistrictLayer);
+        scene.addLayer(shLanduseLayer);
+        scene.addLayer(shBuildingLayer);
+        scene.addLayer(shRoadLayer);
+        scene.addLayer(dotPointLayer);
+        scene.addLayer(flyLine);
+        scene.addLayer(shSubwayLayer);
+
+        // ADD LANDUSE LAYER POP
+        const landuseLayerPop = new LayerPopup({
+          items: [
+            {
+              layer: shLanduseLayer,
+              fields: [
+                {
+                  field: "fclass",
+                  formatField: () => "类型",
+                  formatValue: (fclass) => fclass ?? "No Data",
+                },
+                {
+                  field: "name",
+                  formatField: () => "名称",
+                  formatValue: (name) => name ?? "No Data",
+                },
+              ],
+            },
+          ],
+          trigger: "click",
+        });
+        scene.addPopup(landuseLayerPop);
+
+        // ADD DOT LAYER POP
+        const dotLayerPop = new LayerPopup({
+          items: [
+            {
+              layer: dotPointLayer,
+              fields: [
+                {
+                  field: "area",
+                  formatField: () => "地区",
+                  formatValue: (name?: string) => name?.trim() ?? "No Data",
+                },
+              ],
+            },
+          ],
+          trigger: "hover",
+        });
+        scene.addPopup(dotLayerPop);
+
+        // ADD BUILDING CLICK EVENT
+        shBuildingLayer.on("click", (record) => {
+          map.flyTo({
+            center: record.lngLat,
+            zoom: 16,
+            pitch: 70,
+          });
+
+          setBuildInfo({
+            name: record.feature.properties.name,
+            fclass: record.feature.properties.fclass,
+          });
+          showModal();
         });
 
+        const layerSwitch = new LayerSwitch({
+          layers: [
+            cityLayer,
+            roadLayer,
+            shAreaLayer,
+            shDistrictLayer,
+            shLanduseLayer,
+            shBuildingLayer,
+            shRoadLayer,
+            dotPointLayer,
+            flyLine,
+            shSubwayLayer,
+          ],
+        });
         scene.addControl(layerSwitch);
-        setLayerSwitchAdded(true);
+
+        setCityLayerAdded(true);
+        setRoadLayerAdded(true);
+        setShAreaLayerAdded(true);
+        setShDistrictAdded(true);
+        setShLanduseAdded(true);
+        setShBuildingAdded(true);
+        setShRoadAdded(true);
+        setDotPointAdded(true);
+        setFlyLineAdded(true);
+        setShSubwayAdded(true);
+        console.log("CITY LAYER ADDED");
+        console.log("ROAD LAYER ADDED");
+        console.log("SH AREA LAYER ADDED");
+        console.log("SH DISTRICT LAYER ADDED");
+        console.log("SH LANDUSE LAYER ADDED");
+        console.log("SH BUILDING LAYER ADDED");
+        console.log("SH ROAD LAYER ADDED");
+        console.log("DOT POINT LAYER ADDED");
+        console.log("FLY LINE LAYER ADDED");
+        console.log("SH SUBWAY LAYER ADDED");
+        setIsSuccess(true);
       }
     }
   }, [
@@ -1230,9 +1283,33 @@ export default function SmartCity() {
     shLanduseData,
     shBuildingData,
     shRoadAdded,
-    shRailwayData,
     shSubwayData,
   ]);
 
-  return <div></div>;
+  useEffect(() => {
+    if (isSuccess) {
+      success();
+    }
+  }, [isSuccess]);
+
+  return (
+    <>
+      <div>{contextHolder}</div>
+      <Modal
+        title="建筑信息"
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+      >
+        <p>
+          <strong>建筑名称: </strong>
+          {buildInfo.name ?? "nodata"}
+        </p>
+        <p>
+          <strong>类型: </strong>
+          {buildInfo.fclass ?? "nodata"}
+        </p>
+      </Modal>
+    </>
+  );
 }

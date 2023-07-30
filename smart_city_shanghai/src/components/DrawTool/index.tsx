@@ -5,42 +5,53 @@ import { point, polygon, booleanPointInPolygon } from "@turf/turf";
 import axios from "axios";
 import MapContext from "../../store/map-context";
 import "./index.css";
-import { dataType } from "element-plus/es/components/table-v2/src/common.js";
-import { tr } from "element-plus/es/locale/index.js";
-export const DrawTool = () => {
+import DisplayCard from "../DisplayCard";
+
+export const DrawTool = ({ drawTools }) => {
   const tools = ["drawPolygonTool", "drawRectTool", "drawCircleTool", "delete"];
   const { scene, map } = useContext(MapContext);
   const [dataSource, setDataSource] = useState(null);
   const [dataOk, setDataOk] = useState(false);
+  const [eventData, setEventData] = useState(null);
   const popperStyle = {
     backgroundColor: "#53697670",
     color: "#fff",
     width: 150,
     border: "1px solid #fff",
   };
-  const drawTools = {};
+  const removePoint = (p) => {
+    if (p) {
+      scene.remove(p);
+      p = null;
+    }
+  };
+
   const initDrawTool = () => {
     tools.forEach((tool) => {
       switch (tool) {
         case "drawPolygonTool":
           drawTools[tool] = new DrawPolygon(scene, {
+            name: "POLYGON",
             editable: true,
           });
 
           break;
         case "drawRectTool":
           drawTools[tool] = new DrawRect(scene, {
+            name: "RECT",
             editable: true,
           });
           break;
         case "drawCircleTool":
           drawTools[tool] = new DrawCircle(scene, {
+            name: "CIRCLE",
             editable: true,
           });
           break;
-        case "delete":
-          // 执行删除逻辑
-          break;
+        // case "delete":
+        //   // 执行删除逻辑
+
+        //   break;
         default:
           break;
       }
@@ -55,14 +66,12 @@ export const DrawTool = () => {
   useEffect(() => {
     if (!dataOk) {
       getData();
-      // console.log(dataSource);
       setDataOk(true);
     }
-    // console.log(dataSource);
   }, [dataSource]);
 
   useEffect(() => {
-    if (scene) {
+    if (scene && dataSource) {
       initDrawTool();
     }
   }, [scene, dataSource]);
@@ -77,13 +86,19 @@ export const DrawTool = () => {
       tool.removeActiveFeature();
     }
   };
+
   // const features = [];
   const query = (type) => {
     // 每次将上一次的绘制结果清除
     stopDrawing();
+    initDrawTool();
+    console.log("into fanwei celiang");
 
     // 如果为删除，直接退出
     if (type === "delete") {
+      // stopDrawing();
+      console.log("delete");
+      setEventData(null);
       return;
     }
 
@@ -103,8 +118,6 @@ export const DrawTool = () => {
             } = feature;
             const polygonArea = polygon(coordinates);
 
-            console.log(dataSource.features);
-
             const resData = dataSource.features.filter((item) => {
               const {
                 geometry: { coordinates },
@@ -113,7 +126,8 @@ export const DrawTool = () => {
               const isInArea = booleanPointInPolygon(pointTurf, polygonArea);
               return isInArea;
             });
-            console.log(resData);
+
+            setEventData(resData);
           }
         });
       });
@@ -134,20 +148,24 @@ export const DrawTool = () => {
     </div>
   );
   return (
-    <Popover
-      content={content}
-      title=""
-      placement="top"
-      trigger="click"
-      overlayInnerStyle={popperStyle}
-    >
-      {/* <Button type="primary">Hover Me</Button> */}
-      <div className="item">
-        <button className="btn-toggle">
-          <i className="iconfont icon-paint"></i>
-        </button>
-        <p>范围查询</p>
-      </div>
-    </Popover>
+    <>
+      <Popover
+        content={content}
+        title=""
+        placement="top"
+        trigger="click"
+        overlayInnerStyle={popperStyle}
+      >
+        {/* <Button type="primary">Hover Me</Button> */}
+        <div className="item">
+          <button className="btn-toggle">
+            <i className="iconfont icon-paint"></i>
+          </button>
+          <p>事故查询</p>
+        </div>
+      </Popover>
+
+      <DisplayCard eventData={eventData} />
+    </>
   );
 };
