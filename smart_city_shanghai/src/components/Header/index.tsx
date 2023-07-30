@@ -1,9 +1,6 @@
-import React, { useContext, useEffect } from "react";
-import MapContext from "../../store/map-context";
+import React from "react";
 import "./index.css";
-export default function Header() {
-  const ctx = useContext(MapContext);
-
+const Header: React.FC = () => {
   return (
     <>
       <header className="header">
@@ -11,4 +8,5 @@ export default function Header() {
       </header>
     </>
   );
-}
+};
+export default Header;

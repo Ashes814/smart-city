@@ -9,7 +9,7 @@ import DisplayCard from "../DisplayCard";
 
 export const DrawTool = ({ drawTools }) => {
   const tools = ["drawPolygonTool", "drawRectTool", "drawCircleTool", "delete"];
-  const { scene, map } = useContext(MapContext);
+  const { scene } = useContext(MapContext);
   const [dataSource, setDataSource] = useState(null);
   const [dataOk, setDataOk] = useState(false);
   const [eventData, setEventData] = useState(null);
@@ -18,12 +18,6 @@ export const DrawTool = ({ drawTools }) => {
     color: "#fff",
     width: 150,
     border: "1px solid #fff",
-  };
-  const removePoint = (p) => {
-    if (p) {
-      scene.remove(p);
-      p = null;
-    }
   };
 
   const initDrawTool = () => {
@@ -156,7 +150,6 @@ export const DrawTool = ({ drawTools }) => {
         trigger="click"
         overlayInnerStyle={popperStyle}
       >
-        {/* <Button type="primary">Hover Me</Button> */}
         <div className="item">
           <button className="btn-toggle">
             <i className="iconfont icon-paint"></i>

@@ -1,83 +1,66 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import MapContext from "../../store/map-context";
 import "./index.css";
-import Footer from "../../components/Footer";
 import { DrawTool } from "../../components/DrawTool";
-import { fa } from "element-plus/es/locale/index.js";
 import { MeasureTool } from "../../components/MeasureTool";
 
-const drawTools = {};
-const BottomControl = ({ showControlHandler }) => {
-  const ctx = useContext(MapContext);
-  const { map, scene } = ctx;
-  //   const [isStartRotate, setIsStartRotate] = useState(false);
-  const [isRotate, setIsRotate] = useState(false);
-  const [isOtherDraw, setIsOtherDraw] = useState(false);
-  // const [isShowControl, setIsShowControl] = useState(true);
-  // const [isInWuhan, setIsInWuhan] = useState(false);
+interface DarwToolType {
+  drawPolygonTool?: null;
+}
+const drawTools: DarwToolType = {};
+const BottomControl: React.FC = () => {
+  const { map } = useContext(MapContext);
 
-  const rotateEarth = () => {
-    const zoom = map.getZoom();
-
-    if (zoom < 5) {
-      let center = map.getCenter();
-      center.lng -= 10;
-      map.easeTo({ center, duration: 1000, easing: (n) => n });
-    }
-  };
-  const rotateHandler = () => {
-    if (!isRotate) {
-      rotateEarth();
-    } else {
-      map.stop();
-    }
-    setIsRotate(!isRotate);
-  };
-  // const controlCenterHandler = () => {
-  //   showControlHandler(!isShowControl);
-  //   setIsShowControl(!isShowControl);
-  // };
+  // Map Recover Button
   const viewRecover = () => {
-    map.flyTo({
-      center: [114.3, 30.5],
-      zoom: 1,
-      pitch: 0,
-    });
+    if (map) {
+      map.flyTo({
+        center: [114.3, 30.5],
+        zoom: 1,
+        pitch: 0,
+      });
+    } else {
+      return;
+    }
   };
-  const fylTo = () => {
-    map.flyTo({
-      center: [114.3, 30.5],
-      zoom: 9,
-    });
-  };
-  const fylToSh = () => {
-    map.flyTo({
-      center: [121.42, 31.3],
-      zoom: 9,
-    });
-  };
-  const fylToSc = () => {
-    map.flyTo({
-      center: [114.17967, 22.30405],
-      zoom: 17,
-      pitch: 70,
-    });
-  };
-  // useEffect(() => {
-  //   const moveendListener = () => {
-  //     isRotate && rotateEarth();
-  //   };
 
-  //   if (map) {
-  //     isRotate && rotateEarth();
-  //     map.on("moveend", moveendListener);
-  //   }
-  //   return () => {
-  //     if (map) {
-  //       map.off("moveend", moveendListener);
-  //     }
-  //   };
-  // }, [map, isRotate]);
+  // FLY TO WUHAN
+  const fylTo = () => {
+    if (map) {
+      map.flyTo({
+        center: [114.3, 30.5],
+        zoom: 9,
+      });
+    } else {
+      return;
+    }
+  };
+
+  // FLY TO SHANGHAI
+  const fylToSh = () => {
+    if (map) {
+      map.flyTo({
+        center: [121.42, 31.3],
+        zoom: 9,
+      });
+    } else {
+      return;
+    }
+  };
+
+  // FLY TO SCHOOL
+  const fylToSc = () => {
+    if (map) {
+      map.flyTo({
+        center: [114.17967, 22.30405],
+        zoom: 17,
+        pitch: 70,
+      });
+    } else {
+      return;
+    }
+  };
+
   return (
     <div>
       <div className="btn-groups">
@@ -93,7 +76,6 @@ const BottomControl = ({ showControlHandler }) => {
           </button>
           <p>{"智慧校园"}</p>
         </div>
-
         <div className="item" onClick={fylTo}>
           <button className="btn-toggle">
             <i className="iconfont icon-icon-test"></i>
@@ -106,7 +88,6 @@ const BottomControl = ({ showControlHandler }) => {
           </button>
           <p>{"飞入上海"}</p>
         </div>
-
         <DrawTool drawTools={drawTools} />
         <MeasureTool drawTools={drawTools} />
       </div>

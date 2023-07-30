@@ -1,5 +1,13 @@
 import React from "react";
-
-const MapContext = React.createContext<any>({});
+import mapboxgl from "mapbox-gl";
+import { Scene } from "@antv/l7";
+interface MapSceneContext {
+  map: mapboxgl.Map | null;
+  scene: Scene | null;
+}
+const MapContext = React.createContext<MapSceneContext>({
+  map: null,
+  scene: null,
+});
 
 export default MapContext;

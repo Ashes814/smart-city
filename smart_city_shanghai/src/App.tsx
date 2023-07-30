@@ -8,10 +8,7 @@ import HomeView from "./views/HomeView";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./App.css";
 
-import { PointLayer, PolygonLayer } from "@antv/l7";
-import { buffer, point, toWgs84 } from "@turf/turf";
-
-function App(): React.FC {
+function App(): JSX.Element {
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const [scene, setScene] = useState<Scene | null>(null);
   useEffect(() => {
@@ -35,6 +32,7 @@ function App(): React.FC {
       logoVisible: false,
     });
 
+    // Updating China Boundary
     map.on("style.load", () => {
       map.setFog({});
       // 中华疆土，一寸不让
@@ -59,17 +57,17 @@ function App(): React.FC {
         ["match", ["get", "worldview"], ["all", "CN"], true, false],
       ]);
     });
+
+    // Setting map and scene state
     setMap(map);
     setScene(scene);
   }, []);
 
   return (
     <MapContext.Provider value={{ map, scene }}>
-      {/* <button id="fly">飞到武汉</button> */}
       <Header />
       <Focus />
       <HomeView />
-
       <div id="map"></div>
       <img src="src/assets/images/bg01warp.png" className="bg"></img>
     </MapContext.Provider>

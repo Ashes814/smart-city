@@ -1,4 +1,5 @@
 import "./route.css";
-export default function Root() {
+const Root: React.FC = () => {
   return <div className="school"></div>;
-}
+};
+export default Root;
