@@ -2,12 +2,33 @@ import React, { useEffect, useState, useContext } from "react";
 import { Table, Modal } from "antd";
 import MapContext from "../../store/map-context";
 import { PointLayer, PolygonLayer } from "@antv/l7";
-import { buffer, point, toWgs84 } from "@turf/turf";
+import { buffer, point } from "@turf/turf";
 import "./index.css";
-let pointLayer = null;
-let markLayer = null;
-let bufferLayer = null;
-const DisplayCard = ({ eventData }) => {
+
+interface EventData {
+  geometry: {
+    coordinates: [number, number];
+  };
+  properties: {
+    event_num: number;
+    name: string;
+    detail: {
+      area: string;
+      car_num: string;
+      level: string;
+      phone: string;
+    };
+  };
+}
+
+interface DisplayCardProps {
+  eventData: EventData[];
+}
+
+let pointLayer: PointLayer | null = null;
+let markLayer: PointLayer | null = null;
+let bufferLayer: PolygonLayer | null = null;
+const DisplayCard: React.FC<DisplayCardProps> = ({ eventData }) => {
   const [tableData, setTableData] = useState([]);
   const [detailData, setDetailData] = useState([]);
   const [showTable, setShowTable] = useState(false);
@@ -282,8 +303,6 @@ const DisplayCard = ({ eventData }) => {
           dataSource={detailData}
           columns={detailColumns}
           pagination={false}
-          // style={{ backgroundColor: "lightgray", border: "1px solid black" }}
-          // overlayInnerStyle={{ backgroundColor: "lightgray" }}
         />
       </Modal>
     </>

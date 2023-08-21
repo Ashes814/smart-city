@@ -1,11 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import {
-  DrawPolygon,
-  DrawRect,
-  DrawCircle,
-  DrawLine,
-  DrawEvent,
-} from "@antv/l7-draw";
+import { DrawPolygon, DrawRect, DrawCircle, DrawLine } from "@antv/l7-draw";
 import { Popover } from "antd";
 import MapContext from "../../store/map-context";
 import "./index.css";
