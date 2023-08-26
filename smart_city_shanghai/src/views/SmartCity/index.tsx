@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import MapContext from "../../store/map-context";
 import axios from "axios";
 import { message } from "antd";
